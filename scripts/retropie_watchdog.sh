@@ -20,6 +20,11 @@ if [ "$HYPERIONFIX" = 1 ]; then
    fi
 fi
 
+if [ "$PULSEAUDIO" = 1 ]; then
+   ## echo 'autospawn = no' >> $HOME/.config/pulse/client.conf
+   sudo killall -9 pulseaudio
+fi
+
 # give emulationstation time to start up
 
 sleep 8
@@ -41,6 +46,12 @@ while [ true ]; do
 
 		if [ ! "$VAR1" ]; then
 			sudo openvt -c 7 -s -f clear
+
+## if PULSEAUDIO = 1
+if [ "$PULSEAUDIO" = 1 ]; then
+   ## rm $HOME/.config/pulse/client.conf
+   sudo pulseaudio -D --system
+fi
 
 # restart kodi
 
