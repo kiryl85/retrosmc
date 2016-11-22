@@ -37,6 +37,15 @@ do
 
             mkdir -p /home/osmc/RetroPie/scripts
             touch "/home/osmc/RetroPie/scripts/retrosmc-config.cfg"
+	    
+# create PulseAudio conf file. Might be used later
+
+            if [ ! -d /home/osmc/.config/pulse ] then
+	    mkdir -p /home/osmc/.config/pulse
+	    fi
+	    if [ ! -f /home/osmc/.config/pulse/client.conf ] then
+            touch /home/osmc/.config/pulse/client.conf
+	    fi
 
 # install some programs needed to run the installation and retrosmc
 
@@ -49,6 +58,12 @@ do
             wget --no-check-certificate -w 4 -O /home/osmc/RetroPie/scripts/retropie_watchdog.sh https://raw.githubusercontent.com/mcobit/retrosmc/master/scripts/retropie_watchdog.sh
             chmod +x /home/osmc/RetroPie/scripts/retropie.sh
             chmod +x /home/osmc/RetroPie/scripts/retropie_watchdog.sh
+
+## add fix for PulseAudio
+
+if [[ ! $(grep "autospawn=on" "/home/osmc/.config/pulse/client.conf") ]]; then
+echo -e "autospawn=on" >> "/home/osmc/.config/pulse/client.conf"
+fi
 
 # add fix to config.txt for sound
 
