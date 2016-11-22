@@ -7,22 +7,24 @@
 # ugly fix for people having trouble with CEC
 
 if [ "$CECFIX" = 1 ]; then
-sudo /usr/osmc/bin/cec-client -p 1 &
-sleep 1
-sudo kill -9 $(pidof cec-client)
+    sudo /usr/osmc/bin/cec-client -p 1 &
+    sleep 1
+    sudo kill -9 $(pidof cec-client)
 fi
 
 # deactivate the hyperion deamon if it is running
 
 if [ "$HYPERIONFIX" = 1 ]; then
-   if [ $(pgrep hyperion) ]; then
-      sudo service hyperion stop
-   fi
+    if [ $(pgrep hyperion) ]; then
+        sudo service hyperion stop
+    fi
 fi
 
+# deactivate PulseAudio if used
+
 if [ "$PULSEAUDIO" = 1 ]; then
-   ## echo 'autospawn = no' >> $HOME/.config/pulse/client.conf
-   sudo killall -9 pulseaudio
+    echo 'autospawn=no' >> $HOME/.config/pulse/client.conf
+    sudo killall -9 pulseaudio
 fi
 
 # give emulationstation time to start up
@@ -32,39 +34,42 @@ sleep 8
 # activate hyperion daemon if it is not running
 
 if [ "$HYPERIONFIX" = 1 ]; then
-   if [ ! $(pgrep hyperion) ]; then
-      sudo service hyperion start
-   fi
+    if [ ! $(pgrep hyperion) ]; then
+        sudo service hyperion start
+    fi
 fi
 
 # check for emulationstation running
 
 while [ true ]; do
-	VAR1="$(pgrep emulatio)"
+    VAR1="$(pgrep emulatio)"
 
 # if emulationstation is quit, clear the screen of virtual terminal 7 and show a message
 
-		if [ ! "$VAR1" ]; then
-			sudo openvt -c 7 -s -f clear
+    if [ ! "$VAR1" ]; then
+        sudo openvt -c 7 -s -f clear
 
-## if PULSEAUDIO = 1
-if [ "$PULSEAUDIO" = 1 ]; then
-   ## rm $HOME/.config/pulse/client.conf
-   sudo pulseaudio -D --system
-fi
+## clean PulseAudio conf file and run PulseAUdio
+
+        if [ "$PULSEAUDIO" = 1 ]; then
+			   ## > $HOME/.config/pulse/client.conf
+			   ## lub
+			   echo -n > /home/osmc/.config/pulse/client.conf
+			   sudo pulseaudio -D --system
+		fi
 
 # restart kodi
 
-	sudo su -c "sudo systemctl restart mediacenter &" &
+		sudo su -c "sudo systemctl restart mediacenter &" &
 
 # exit script
 
-			exit
-		else
+		exit
+	else
 
 # if emulationstation is still running, wait 2 seconds and check again (could probably be longer, but doesn't seem to impact performance by much)
 
-			sleep 2
-fi
+		sleep 2
+	fi
 done
 exit
